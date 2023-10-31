@@ -33,7 +33,7 @@ onMounted(() => {
       <img src="../assets/alat-sehat.svg" alt="logo-alat-sehat">
     </router-link>
     <div class="flex gap-5">
-      <router-link v-if="!isLogin" to="/"
+      <router-link v-if="!isLogin" to="/register"
         class="px-9 py-3 rounded-full uppercase border border-brand-blue-400 text-brand-blue-400 hover:bg-slate-200 transition-all">
         daftar
       </router-link>

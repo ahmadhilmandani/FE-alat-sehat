@@ -3,22 +3,36 @@ import { IconTrash } from '@tabler/icons-vue';
 import { IconPencil } from '@tabler/icons-vue';
 import axios from 'axios'
 import { ref, onMounted } from 'vue';
+import SuccessToast from '../components/SuccessToast.vue';
 
 const dataCart = ref(null)
 const isLoading = ref(true)
 const refactorDataCart = ref([])
 const isChecked = ref(null)
 
+const isShowToast = ref(false)
+
+function showToast() {
+  isShowToast.value = true
+
+  setTimeout(() => {
+    isShowToast.value = false;
+    location.reload();
+    this.$router.push({ name: 'Home' })
+    
+  }, 5000)
+}
+
 function checkout(paramPaymentMethod) {
   axios.post(`http://localhost:5020/api/user/checkout/${isChecked.value}/${localStorage.getItem('id_user')}`, {
     paymentMethod: paramPaymentMethod
   }).then((respone) => {
     console.log(respone)
+    showToast()
   }).catch((error) => {
     console.log(error)
   })
 
-  location.reload();
 }
 
 onMounted(async () => {
@@ -117,21 +131,20 @@ console.log(refactorDataCart.value)
     </div>
 
     <div class="fixed bottom-0 left-0 right-0 text-center font-bold text-xl  flex justify-between">
-      <button 
-      @click="() => { 
-        checkout('prepaid') 
-        this.$router.push({ name: 'Home' }) 
-        }" class="flex-1 py-8"
+      <button @click="() => {
+        checkout('prepaid')
+        // this.$router.push({ name: 'Home' }) 
+      }" class="flex-1 py-8"
         :class="!isChecked ? 'bg-gray-300 text-gray-600' : 'bg-brand-blue-50 text-brand-blue-400'">
         Prepaid Checkout
       </button>
-      <button @click="() => { 
-        checkout('postpaid') 
-        this.$router.push({ name: 'Home' }) 
-        }" class="flex-1 py-8"
-        :class="!isChecked ? 'bg-gray-400 text-gray-600' : 'bg-brand-blue-300 text-white'">
+      <button @click="() => {
+        checkout('postpaid')
+        // this.$router.push({ name: 'Home' }) 
+      }" class="flex-1 py-8" :class="!isChecked ? 'bg-gray-400 text-gray-600' : 'bg-brand-blue-300 text-white'">
         Postpaid Checkout
       </button>
     </div>
+    <SuccessToast v-if="isShowToast" detailMsg="Berhasil melakukan checkout, cek email anda!" />
   </div>
 </template>
