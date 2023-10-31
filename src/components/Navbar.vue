@@ -4,9 +4,10 @@ import { onMounted, ref } from 'vue';
 import axios from 'axios';
 
 const isLogin = ref(localStorage.getItem("isLogin"))
+const role = ref(localStorage.getItem('role'))
 
 async function logout() {
- await axios.get('http://localhost:5020/api/auth/logout')
+  await axios.get('http://localhost:5020/api/auth/logout')
     .then((response) => {
       console.log(response)
     })
@@ -47,6 +48,11 @@ onMounted(() => {
           <IconShoppingCart stroke-width="1.5" />
         </router-link>
 
+        <router-link to="/shop" v-if="role == 'shop'"
+          class="rounded-full px-9 py-3 uppercase font-bold bg-emerald-100 text-emerald-500 hover:bg-emerald-200/70">
+          Dashboard Toko
+        </router-link>
+
         <button class="rounded-full px-9 py-3 uppercase font-bold bg-red-200 text-red-500 hover:bg-red-200/70" @click="() => {
           console.log('click');
           logout();
@@ -55,8 +61,6 @@ onMounted(() => {
           Logout
         </button>
       </div>
-
-
     </div>
   </nav>
 </template>

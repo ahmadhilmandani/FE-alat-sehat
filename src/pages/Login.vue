@@ -12,10 +12,11 @@ const login = async () => {
   isLoading.value = true
   await axios.post('http://localhost:5020/api/auth/login', { email: email.value, password: password.value })
     .then((response) => {
+      console.log(response.data)
       localStorage.setItem("isLogin", true)
       localStorage.setItem("name", response.data[0].name)
       localStorage.setItem("id_user", response.data[0].id_user)
-      localStorage.setItem("role", response.data[0].user_role)
+      localStorage.setItem("role", response.data[0].role)
     })
     .catch((error) => {
       console.log(error);
