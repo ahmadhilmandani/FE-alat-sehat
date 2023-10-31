@@ -1,21 +1,7 @@
 <script setup>
-import axios from 'axios'
-
 defineProps({
   dataProduct: Object
 })
-
-function storeToCart() {
-  axios.post('http://localhost:5020/api/user/cart', )
-    .then(() => {
-
-
-    })
-    .catch(() => {
-
-    })
-}
-
 </script>
 
 <template>
@@ -36,10 +22,7 @@ function storeToCart() {
         Lihat Detail
       </router-link>
 
-      <button
-        class="block flex-1 text-center capitalize px-3 py-3 rounded-md border bg-brand-blue-300 border-brand-blue-300 text-brand-white-50 font-semibold hover:shadow-xl hover:shadow-brand-blue-300/70 hover:-translate-y-2 transition-all">
-        Tambah ke Keranjang
-      </button>
+      <slot name="tambahKeranjang" />
     </div>
   </div>
 </template>

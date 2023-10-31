@@ -4,6 +4,42 @@ import Card from '../components/Card.vue';
 import axios from 'axios';
 
 const dataProduct = ref(null)
+const showPopUpAddToCart = ref(false)
+const showPopUpProductId = ref(null)
+const showPopUpShopId = ref(null)
+const dataPopUp = ref(null)
+const quantity = ref(0)
+
+function popUpAddToCart() {
+  axios.get(`http://localhost:5020/api/user/product/${showPopUpProductId.value}/${showPopUpShopId.value}`)
+    .then((response) => {
+      dataPopUp.value = response.data
+      console.log(response.data)
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+    .finally(() => {
+      // isLoading.value = false
+    })
+}
+
+function storeToCart() {
+  // isLoading.value = true
+  axios.post('http://localhost:5020/api/user/cart', {
+    productId: showPopUpProductId.value,
+    userId: localStorage.getItem("id_user"),
+    shopId: showPopUpShopId.value,
+    quantity: quantity.value,
+    price: dataPopUp.value[0].product_price
+  }).then((response) => {
+    console.log(response)
+  }).catch((error) => {
+    console.log(error)
+  }).finally(() => {
+    // isLoading.value = false
+  })
+}
 
 onMounted(() => {
   axios.get('http://localhost:5020/api/user/products')
@@ -21,7 +57,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="w-full min-h-[300vh] mt-5">
+  <div class="w-full mt-5 relative">
     <header class="bg-brand-blue-50 rounded-xl text-center py-20 text-brand-blue-400 mb-10">
       <h1 class="uppercase text-5xl font-semibold mb-8 tracking-wide">Selamat datang!</h1>
       <p class="w-[50%] mx-auto text-xl"> Kami siap memberikan layanan terbaik dan produk berkualitas untuk menjaga
@@ -58,8 +94,47 @@ onMounted(() => {
         </div>
       </aside>
       <main class="grid grid-cols-3 gap-8">
-        <Card v-for="item in dataProduct" :dataProduct="item" />
+        <Card v-for="item in dataProduct" :dataProduct="item">
+          <template #tambahKeranjang>
+            <button @click="() => {
+              showPopUpAddToCart = true
+              showPopUpProductId = item.product_id
+              showPopUpShopId = item.user_id
+              popUpAddToCart()
+            }"
+              class="block flex-1 text-center capitalize px-3 py-3 rounded-md border bg-brand-blue-300 border-brand-blue-300 text-brand-white-50 font-semibold hover:shadow-xl hover:shadow-brand-blue-300/70 hover:-translate-y-2 transition-all">
+              Tambah ke Keranjang
+            </button>
+          </template>
+        </Card>
       </main>
+    </div>
+
+    <div v-if="showPopUpAddToCart" id="main-container" @click="() => { showPopUpAddToCart = false }"
+      class="bg-brand-blue-400/80 fixed top-0 bottom-0 left-0 right-0 z-[99] flex justify-center items-center">
+      <div class="w-[380px] h-[600px] flex flex-col justify-between bg-brand-white-50 rounded-md p-4" @click.stop>
+        <div>
+          <div class="p-8 border border-brand-blue-100 rounded-xl w-full aspect-square mb-3">
+            <div class="w-full h-full rounded-lg object-cover bg-cover bg-center"
+              :style="`background-image: url(${dataPopUp[0].product_thumbnail})`"></div>
+          </div>
+          <h2 class="uppercase mb-2 line-clamp-2">{{ dataPopUp[0].product_name }}</h2>
+          <h2 class="font-bold mb-2">Rp. {{ dataPopUp[0].product_price }}</h2>
+          <div class="text-gray-400 mb-2">Lokasi toko <strong>{{ dataPopUp[0].city_name }}</strong></div>
+          <div class="text-gray-400 mb-5">Tersisi {{ dataPopUp[0].product_stock }} buah</div>
+        </div>
+        <div class="flex gap-3">
+          <input type="number" name="quantity" id="quantity" v-model="quantity"
+            class="rounded-full px-4 py-2 outline-0 border border-brand-blue-300" placeholder="1">
+          <button @click="()=>{
+            storeToCart()
+            showPopUpAddToCart = false
+            }"
+            class="block flex-1 capitalize px-3 py-3 rounded-md border border-brand-blue-300 text-brand-white-50 font-bold bg-brand-blue-300 hover:shadow-xl hover:shadow-brand-blue-300/30 hover:-translate-y-2 transition-all">
+            Tambakan
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
